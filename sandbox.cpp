@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "neural_network.hpp"
+#include "activation_function.hpp"
 
 using namespace std;
 

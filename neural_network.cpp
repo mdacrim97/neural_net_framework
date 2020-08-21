@@ -1,6 +1,6 @@
 #include "neural_network.hpp"
 
-NeuralNetwork::NeuralNetwork(int layers[], int layersCount, tuple<(*pActivation)(double),(*pDerivative)(double)> actsAndDers[]){
+NeuralNetwork::NeuralNetwork(int layers[], int layersCount, ActivationFunction layerActivations[]){
 	//code go here
 }
 
@@ -28,7 +28,7 @@ void NeuralNetwork::prune(){
 	//code go here
 }
 
-void NeuralNetwork::insertLayer(int size, tuple<(*pActivation)(double),(*pDerivative)(double), int position=NULL){
+void NeuralNetwork::insertLayer(int size, ActivationFunction activationFunction, int position=NULL){
    	//if null adds to end of network.
 } 
 void NeuralNetwork::removeLayer(int position=NULL){
@@ -50,42 +50,4 @@ void NeuralNetwork::activateEdge(int layerPos, int neuronPos, int edgePos){
 void NeuralNetwork::disableEdge(int layerPos, int neuronPos, int edgePos){
 
 }
-
-
-//Activation functions and their derivatives.
-double sigmoid(double input){
-
-}
-double sidmoidDerivative(double input){
-
-}
-
-double tanh(double input){
-
-}
-double tanhDerivative(double input){
-
-}
-
-double reLu(double input){
-
-}
-double reLuDerivative(double input){
-}
-
-double leakyReLu(double input){
-
-}
-double leakyReLuDerivative(double input){
-
-}
-
-double swish(double input){
-
-}
-double swishDerivative(double input){
-
-}
-
-
 
