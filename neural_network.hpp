@@ -22,8 +22,6 @@ class NeuralNetwork{
 		vector<int> layerSizeVec; 
 		vector<ActivationFunction> layerActivation;
 		std::vector<Neuron> neuralNetwork; //adjacency list of all neurons.
-		
-		int size; //number of layers in the network
 		bool built = false; //true if built
 		
 		//functions
@@ -52,6 +50,10 @@ class NeuralNetwork{
 
 		void activateEdge(int layerPos, int neuronPos, int edgePos); //sets weight via initWeight()
 		void disableEdge(int layerPos, int neuronPos, int edgePos); //sets edge weight to null
+
+		int getOrder(); //returns total number of neurons
+		int getSize(); //returns amount of edges
+		int getLayerCount(); //returns number of layers including input and output layer
 
 }
 
