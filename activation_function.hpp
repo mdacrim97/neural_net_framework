@@ -11,12 +11,22 @@ class ActivationFunction{
 
 	private:
 
-		double (*pFunction)(double),
-			   (*pDerivative)(double),
-			   alpha;			
-
+		int paramCount;
 		std::string name;
+		double alpha;
+
+		//unions used for whether function being used is 1 or 2 parameters
+		union{
+			double (*oneArg)(double);
+			double (*twoArg)(double, double);
 		
+		} function;
+
+		union {
+			double (*oneArg)(double);
+			double (*twoArg)(double, double);
+
+		} derivative;		
 
 		//provided activation functions
 		static double sigmoid(double z);
@@ -38,13 +48,13 @@ class ActivationFunction{
 		static double leakyReLuDerivative(double z, double alpha=1);
 
 		static double swish(double z);
-		static double swishDerivative(double z);
-		
+		static double swishDerivative(double z);		
 
 	public:
 
 		ActivationFunction(double (*pActivation)(double), double (*pActivationDerivative)(double), std::string name="Custom");
-		ActivationFunction(std::string functionName);
+		ActivationFunction(double (*pActivation)(double, double), double (*pActivationDerivative)(double, double), std::string name="Custom", double alpha=1);
+		ActivationFunction(std::string functionName, double alpha=1);
 		
 		std::string getName();
 		double callFunction(double x);

@@ -2,59 +2,82 @@
 
 ActivationFunction::ActivationFunction(double (*pActivation)(double), double (*pActivationDerivative)(double), std::string name ){
 
-	this->pFunction = pActivation;
-	this->pDerivative = pActivationDerivative;
-	this->name = name;	
+		
+	this->function.oneArg = pActivation;
+	this->derivative.oneArg = pActivationDerivative;
+	this->paramCount = 1;
+	this->name = name;
 }
 
-ActivationFunction::ActivationFunction(std::string function){
+ActivationFunction::ActivationFunction(double (*pActivation)(double, double), double (*pActivationDerivative)(double, double), std::string name, double alpha){
+	this->function.twoArg = pActivation;
+	this->derivative.twoArg = pActivationDerivative;
+	this->alpha = alpha;
+	this->paramCount = 2;
+	this->name = name;
+}
+
+ActivationFunction::ActivationFunction(std::string function, double alpha){
 
 	if(function.compare("sigmoid") == 0){
-		pFunction = sigmoid;
-		pDerivative = sigmoidDerivative;
+		this->function.oneArg = sigmoid;
+		this->derivative.oneArg = sigmoidDerivative;
+		paramCount = 1;
 	}
 	else if(function.compare("linear") == 0){
-		//pFunction = linear;
-		//pDerivative = linearDerivative;
+		this->function.twoArg = linear;
+		this->function.twoArg = linearDerivative;
+		paramCount = 2;
 	}
 	else if(function.compare("elu") == 0){
-		//pFunction = elu;
-		//pDerivative = eluDerivative;
+		this->function.twoArg = elu;
+		this->derivative.twoArg = eluDerivative;
+		paramCount = 2;
 	}
 	else if(function.compare("reLu") == 0){
-		pFunction = reLu;
-		pDerivative = reLuDerivative;		
+		this->function.oneArg = reLu;
+		this->function.oneArg = reLuDerivative;	
+		paramCount = 1;	
 	}
 	else if(function.compare("leaky_reLu") == 0){
-		//pFunction = leakyRelu;
-		//pDerivative = leakyReluDerivative;	
+		this->function.twoArg = leakyReLu;
+		this->derivative.twoArg = leakyReLuDerivative;	
+		paramCount = 2;
 	}
 	else if(function.compare("tanh") == 0){
-		pFunction = tanh;
-		pDerivative = tanhDerivative;
+		this->function.oneArg = tanh;
+		this->derivative.oneArg = tanhDerivative;
+		paramCount = 1;
 	}
 	else if(function.compare("swish") == 0){
-		pFunction = swish;
-		pDerivative = swishDerivative;	
+		this->function.oneArg = swish;
+		this->derivative.oneArg = swishDerivative;
+		paramCount = 1;	
 	}
 	else{
 		  //need to throw custom exception here
 	}
 
 	this->name = function;
+	this->alpha = alpha;
 
 }
 
 std::string ActivationFunction::getName(){
 	return this->name;
 }
+
 double ActivationFunction::callFunction(double x){
-	return this->pFunction(x);
-}
-double ActivationFunction::callDerivative(double x){
-	return this->pDerivative(x);
+	if(this->paramCount == 1)
+		return this->function.oneArg(x);
+	return this->function.twoArg(x, this->alpha);
 }
 
+double ActivationFunction::callDerivative(double x){
+	if(this->paramCount == 1)
+		return this->derivative.oneArg(x);
+	return this->derivative.twoArg(x, this->alpha);
+}
 
 double ActivationFunction::sigmoid(double z){
 	return 1/(1 + std::pow(M_E, -z));
