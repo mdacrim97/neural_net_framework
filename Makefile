@@ -1,4 +1,4 @@
-runNetwork: neural_network.o sandbox.o activation_function.0
+runNetwork: neural_network.o sandbox.o activation_function.o
 
 sandbox.o: sandbox.cpp
 	cc -c sandbox.cpp

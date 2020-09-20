@@ -1,23 +1,22 @@
 //AREA TO TEST IMPLEMENTATIONS
 
 #include <iostream>
-//#include "neural_network.hpp"
+#include "neural_network.hpp"
 #include "activation_function.hpp"
 
 using namespace std;
 
-double test1(double z){
-	return 0.420;
-}
-
-double test2(double z, double alpha)
-{
-	return 0.666;
-}
-
 int main (int argc, char** argv){
 
-	ActivationFunction tester = ActivationFunction(test2, test2, "test", 3);
-	ActivationFunction sigmoid = ActivationFunction("swish");
+
+	ActivationFunction elu = ActivationFunction("elu");
+
+	ActivationFunction layerFunctions[4] = {elu, elu, elu, elu};
+	int layerSizes[5] = {2, 16, 8, 4, 1};
+	NeuralNetwork testNetwork = NeuralNetwork(layerSizes, 5, layerFunctions);
+	cout << "here" << endl;
+
+	
+
 	return 0;
 }

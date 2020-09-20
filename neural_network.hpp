@@ -19,8 +19,8 @@ class NeuralNetwork{
 	
 	private:
 		
-		vector<int> layerSizeVec; 
-		vector<ActivationFunction> layerActivation;
+		vector<int> layerSizes; 
+		vector<ActivationFunction> layerActivations;
 		std::vector<Neuron> neuralNetwork; //adjacency list of all neurons.
 		bool built = false; //true if built
 		
@@ -28,7 +28,7 @@ class NeuralNetwork{
 		void initializeWeight();
 		void activate(); // will activate each neuron in the network
 		void updateWeights();
-		int getNeuronPos(int layerPos, int neuronPos = NULL); //if null gets the first neuron of the layer.
+		int getNeuronPos(int layerPos, int neuronPos = -1); //if null gets the first neuron of the layer.
 
 	public:
 		
@@ -38,15 +38,17 @@ class NeuralNetwork{
 
 		//main functions for using model. 
 		void build(); //puts the network together
-		void train(double data[][], int xDim, int yDim);
+		void train(std::string path, int xDim, int yDim); //path to csv of training data. will be manuaally split bsaed on xDim and yDim
 		void prune();
 
 		//utility functions
-		void insertLayer(int size, ActivationFunction activationFunction, int position=NULL); //if null adds to end of network.
-		void removeLayer(int position=NULL); //if null removes last layer
+		void debug();
+
+		void insertLayer(int size, ActivationFunction activationFunction, int position= -1); //if null adds to end of network.
+		void removeLayer(int position=-1); //if null removes last layer
 		
-		void insertNeuron(int layerPos, int neuronPos = NULL); //if null adds to end
-		void removeNeuron(int layerPos, int neuronPos = NULL); //if null removes from the end
+		void insertNeuron(int layerPos, int neuronPos = -1); //if null adds to end
+		void removeNeuron(int layerPos, int neuronPos = -1); //if null removes from the end
 
 		void activateEdge(int layerPos, int neuronPos, int edgePos); //sets weight via initWeight()
 		void disableEdge(int layerPos, int neuronPos, int edgePos); //sets edge weight to null
@@ -55,7 +57,7 @@ class NeuralNetwork{
 		int getSize(); //returns amount of edges
 		int getLayerCount(); //returns number of layers including input and output layer
 
-}
+};
 
 
 #endif
