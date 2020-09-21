@@ -67,6 +67,10 @@ std::string ActivationFunction::getName(){
 	return this->name;
 }
 
+int ActivationFunction::getParamCount(){
+	return paramCount;
+}
+
 double ActivationFunction::callFunction(double x){
 	if(this->paramCount == 1)
 		return this->function.oneArg(x);

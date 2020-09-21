@@ -2,6 +2,7 @@
 #define NEURAL_NETWORK
 
 #include <vector>
+#include <random>
 #include "activation_function.hpp"
 
 
@@ -11,7 +12,7 @@ using namespace std;
 struct Neuron{
 	double value,
 		   derivativeValue; 
-	vector<double*> pWeights; // if pWeights == nullptr it is not connected.
+	vector<double*> edges; // if edges[i] == nullptr it is not connected.
 };
 
 
@@ -25,7 +26,7 @@ class NeuralNetwork{
 		bool built = false; //true if built
 		
 		//functions
-		void initializeWeight();
+		void initializeWeights(Neuron *n);
 		void activate(); // will activate each neuron in the network
 		void updateWeights();
 		int getNeuronPos(int layerPos, int neuronPos = -1); //if null gets the first neuron of the layer.
@@ -34,7 +35,7 @@ class NeuralNetwork{
 		
 		//contructor and destructor
 		NeuralNetwork(int layers[], int layersCount, ActivationFunction layerActivations[]);
-		~NeuralNetwork();
+		~NeuralNetwork(){};
 
 		//main functions for using model. 
 		void build(); //puts the network together
@@ -58,6 +59,8 @@ class NeuralNetwork{
 		int getLayerCount(); //returns number of layers including input and output layer
 
 };
+
+double randDouble();
 
 
 #endif

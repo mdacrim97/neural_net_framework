@@ -55,8 +55,10 @@ class ActivationFunction{
 		ActivationFunction(double (*pActivation)(double), double (*pActivationDerivative)(double), std::string name="Custom");
 		ActivationFunction(double (*pActivation)(double, double), double (*pActivationDerivative)(double, double), std::string name="Custom", double alpha=1);
 		ActivationFunction(std::string functionName, double alpha=1);
+		~ActivationFunction(){}
 		
 		std::string getName();
+		int getParamCount();
 		double callFunction(double x);
 		double callDerivative(double x);
 
