@@ -26,7 +26,7 @@ class NeuralNetwork{
 		bool built = false; //true if built
 		
 		//functions
-		void initializeWeights(Neuron *n);
+		void initializeWeights(Neuron *n, int edges);
 		void activate(); // will activate each neuron in the network
 		void updateWeights();
 		int getNeuronPos(int layerPos, int neuronPos = -1); //if null gets the first neuron of the layer.

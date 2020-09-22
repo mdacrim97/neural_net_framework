@@ -16,7 +16,12 @@ int main (int argc, char** argv){
 
 	NeuralNetwork testNetwork = NeuralNetwork(layerSizes, 5, layerFunctions);
 
-	testNetwork.debug();
+	testNetwork.build();
+	//testNetwork.debug();
+
+	cout << testNetwork.getOrder() << endl;
+	cout << testNetwork.getSize() << endl;
+	cout << testNetwork.getLayerCount() << endl;
 
 	return 0;
 }
