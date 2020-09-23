@@ -9,6 +9,14 @@ NeuralNetwork::NeuralNetwork(int layers[], int layersCount, ActivationFunction l
 	}
 }
 
+NeuralNetwork::~NeuralNetwork(){
+
+	//for each neuron delete each edge.
+	for(std::vector<Neuron>::iterator neuron = neuralNetwork.begin(); neuron!=neuralNetwork.end(); neuron++)
+		for(std::vector<double*>::iterator edge = neuron->edges.begin(); edge != neuron->edges.end(); edge++)
+			delete *edge;
+}
+
 
 void NeuralNetwork::debug(){
 
@@ -68,10 +76,41 @@ void NeuralNetwork::build(){
 			//if the layer we are adding neurons to is the output layer dont add edges to them.
 			if(next(it) != layerSizes.end())
 				initializeWeights(&n, neuronEdges);
-			
 			neuralNetwork.push_back(n);
 		}
 	}
+}
+
+
+void NeuralNetwork::enableEdge(int layerPos, int neuronPos, int edgePos){
+
+	if(layerPos >= layerSizes.size() - 1){
+		//throw invalid layer exception since there will be no edges to enable in the output layer
+	}
+
+	int position = 0;
+	for(std::vector<int>::iterator it = layerSizes.begin(); it != layerSizes.begin() + layerPos; it++)
+		position += *it;
+	position += neuronPos;
+
+	*((neuralNetwork.at(position)).edges.at(edgePos)) = randDouble();
+
+}
+
+
+void NeuralNetwork::disableEdge(int layerPos, int neuronPos, int edgePos){
+
+	if(layerPos >= layerSizes.size() - 1){
+		//throw invalid layer exception since there will be no edges to enable in the output layer
+	}
+
+	int position = 0;
+	for(std::vector<int>::iterator it = layerSizes.begin(); it != layerSizes.begin() + layerPos; it++)
+		position += *it;
+	position += neuronPos;
+
+	(neuralNetwork.at(position)).edges.at(edgePos) = nullptr;
+
 }
 
 
@@ -86,41 +125,12 @@ void NeuralNetwork::updateWeights(){
 
 
 void NeuralNetwork::train(std::string path, int xDim, int yDim){
-	//code go here
+	
 }
 
 
 void NeuralNetwork::prune(){
-	//code go here
-}
-
-
-void NeuralNetwork::insertLayer(int size, ActivationFunction activationFunction, int position){
-   	//if null adds to end of network.
-} 
-
-
-void NeuralNetwork::removeLayer(int position){
- 	//if null removes last layer
-}
-
-
-void NeuralNetwork::insertNeuron(int layerPos, int neuronPos){
-	//if null adds to end
-}
-
-
-void NeuralNetwork::removeNeuron(int layerPos, int neuronPos){
-
-}
-
-void NeuralNetwork::activateEdge(int layerPos, int neuronPos, int edgePos){
-
-}
-
-
-void NeuralNetwork::disableEdge(int layerPos, int neuronPos, int edgePos){
-
+	
 }
 
 

@@ -35,7 +35,7 @@ class NeuralNetwork{
 		
 		//contructor and destructor
 		NeuralNetwork(int layers[], int layersCount, ActivationFunction layerActivations[]);
-		~NeuralNetwork(){};
+		~NeuralNetwork();
 
 		//main functions for using model. 
 		void build(); //puts the network together
@@ -45,13 +45,7 @@ class NeuralNetwork{
 		//utility functions
 		void debug();
 
-		void insertLayer(int size, ActivationFunction activationFunction, int position= -1); //if null adds to end of network.
-		void removeLayer(int position=-1); //if null removes last layer
-		
-		void insertNeuron(int layerPos, int neuronPos = -1); //if null adds to end
-		void removeNeuron(int layerPos, int neuronPos = -1); //if null removes from the end
-
-		void activateEdge(int layerPos, int neuronPos, int edgePos); //sets weight via initWeight()
+		void enableEdge(int layerPos, int neuronPos, int edgePos);
 		void disableEdge(int layerPos, int neuronPos, int edgePos); //sets edge weight to null
 
 		int getOrder(); //returns total number of neurons
