@@ -79,6 +79,8 @@ void NeuralNetwork::build(){
 			neuralNetwork.push_back(n);
 		}
 	}
+	
+	built = true;
 }
 
 
@@ -114,8 +116,14 @@ void NeuralNetwork::disableEdge(int layerPos, int neuronPos, int edgePos){
 }
 
 
-void NeuralNetwork::activate(){
+void NeuralNetwork::activate(std::vector<double> input){
 
+	//sets each input neuron's value
+	for(int i = 0; i < *layerSizes.begin(); i++)
+		neuralNetwork.at(i).value = input.at(i);
+
+	//now activates network.s
+	
 }
 
 
