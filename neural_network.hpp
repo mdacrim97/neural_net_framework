@@ -46,8 +46,8 @@ class NeuralNetwork{
 		void build(); //puts the network together
 
 		//need implemented train and prune
-		void train(std::string path, int xDim, int yDim); //path to csv of training data. will be manuaally split bsaed on xDim and yDim
-		void prune();
+		void train(std::string path, int iterations); //path to csv of training data. will be automagically split into xDim and yDim based on inp and out layer sizes.
+		void prune(double variance);
 
 		//utility functions
 		void debug();
