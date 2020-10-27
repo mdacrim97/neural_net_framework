@@ -133,16 +133,16 @@ void NeuralNetwork::activate(std::vector<double> input){
 		if(curLayer == 0)
 			(*neuron).value = finishedNets.at(curNeuron);
 		else
-			(*neuron.value) =layerActivations.at(curLayer-1).callFunction(finishedNets.at(curNeuron));
+			(*neuron).value =layerActivations.at(curLayer-1).callFunction(finishedNets.at(curNeuron));
 	
 		if(curLayer < layerSizes.size() - 1){ //collects net weights up until the next to last layer. because no point doing it for the output layer.
 			//for loop for each edge of the current neuron we are on.
-			int edgeCount = *neuron.edges.size();
+			int edgeCount = (*neuron).edges.size();
 			for(int i=0; i < edgeCount; i++){
-				if(*neuron.edges.at(i) == nullptr) //dont add into net weights if edge is not connected.
+				if((*neuron).edges.at(i) == nullptr) //dont add into net weights if edge is not connected.
 					continue; 
 				else
-					computingNets[i] += *neuron.value *  *(*neuron.edges.at(i));
+					computingNets[i] += (*neuron).value *  *(*neuron).edges.at(i);
 			}
 		}
 		
@@ -174,7 +174,7 @@ void NeuralNetwork::train(std::string path, int iterations){
 void NeuralNetwork::prune(double variance){
 
 	for(std::vector<Neuron>::iterator neuron = neuralNetwork.begin(); neuron != neuralNetwork.end(); neuron++)
-		for(std::vector<double*>::iterator edge = *neuron.edges.begin(); edge != *neuron.edges.end(); edge++)
+		for(std::vector<double*>::iterator edge = (*neuron).edges.begin(); edge != (*neuron).edges.end(); edge++)
 			if(0.0 - variance < **edge && **edge < 0.0 + variance)
 				*edge = nullptr; 
 }
