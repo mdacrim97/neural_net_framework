@@ -18,6 +18,7 @@ int main (int argc, char** argv){
 
 	testNetwork.build();
 	//testNetwork.debug();
+	testNetwork.train("myfile.csv", 3);
 
 	cout << testNetwork.getOrder() << endl;
 	cout << testNetwork.getSize() << endl;

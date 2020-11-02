@@ -3,16 +3,16 @@
 
 #include <vector>
 #include <random>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <iostream>
 #include "activation_function.hpp"
-
-
-using namespace std;
-
 
 struct Neuron{
 	double value,
 		   derivativeValue; 
-	vector<double*> edges; // if edges[i] == nullptr it is not connected.
+	std::vector<double*> edges; // if edges[i] == nullptr it is not connected.
 };
 
 
@@ -20,8 +20,8 @@ class NeuralNetwork{
 	
 	private:
 		
-		vector<int> layerSizes; 
-		vector<ActivationFunction> layerActivations;
+		std::vector<int> layerSizes; 
+		std::vector<ActivationFunction> layerActivations;
 		std::vector<Neuron> neuralNetwork; //adjacency list of all neurons.
 		bool built = false; //true if built
 		

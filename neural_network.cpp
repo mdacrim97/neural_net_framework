@@ -25,21 +25,21 @@ void NeuralNetwork::debug(){
 	for(std::vector<ActivationFunction>::iterator it = layerActivations.begin(); it != layerActivations.end(); it++){
 		std::cout << ' '<< it->getName(); 
 	}
-	std::cout << endl;
+	std::cout << std::endl;
 	 
 	//print layer sizes vec
 	std::cout << "layer Sizes: ";
 	for(std::vector<int>::iterator it= layerSizes.begin(); it!= layerSizes.end(); it++){
 		std:: cout << ' ' << *it;
 	}
-	std:: cout << endl;
+	std:: cout << std::endl;
 
 	//print an neurons edges.
 	std:: cout << "neuron 0 edge weights: ";
 	for(std::vector<double*>::iterator it = neuralNetwork[0].edges.begin(); it != neuralNetwork[0].edges.end(); it++){
 		std:: cout << ' ' << **it;
 	}
-	std:: cout << endl; 
+	std:: cout << std::endl; 
 }
 
 
@@ -167,7 +167,49 @@ void NeuralNetwork::updateWeights(){
 
 
 void NeuralNetwork::train(std::string path, int iterations){
+
+	//Read in csv into xDim and yDim vectors to hold the training data.
+	std::vector<std::vector<double>> xDim;
+	std::vector<std::vector<double>> yDim;	
+
+
+	std::ifstream file(path);
+	while(file){
+
+		std::string line;
+	  	if(!getline(file,line)) 
+			break;
 	
+	  	std::istringstream ss(line);
+	  	std::vector<double> xVals;
+		std::vector<double> yVals;
+
+		int i = 1;
+		int xSize = layerSizes.at(0); //get how many values based on how many input neurons.
+
+	  	while(ss){
+	    	std::string s;
+	    	if(!getline(ss, s, ',')) 
+				break;
+		
+			//put data into either xDim or yDim based on which element of the line working on.
+			if(i<= xSize)
+	    		xVals.push_back(stod(s));
+			else
+				yVals.push_back(stod(s));
+			i++;
+	  	}
+		
+  		xDim.push_back(xVals);
+		yDim.push_back(yVals);
+	}
+		/*
+		7. for how many iterations go over the data.
+		8. pass xDim with activate function
+		9. get out the actual values from output layer. 
+		10. caluclate error between actual and the target from yDim.
+		11. based on error update the neural networks weights.
+		*/
 }
 
 
