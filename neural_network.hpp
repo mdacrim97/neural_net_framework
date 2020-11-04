@@ -28,13 +28,11 @@ class NeuralNetwork{
 		//functions
 		void initializeWeights(Neuron *n, int edges);
 
-		//needs implemented 
-		void activate(std::vector<double> input); // will activate each neuron in the network
-
-		void updateWeights();
+		//needs tested
+		std::vector<double> activate(std::vector<double> input); // will activate each neuron in the network
 
 		//needs implemented
-		int getPosition(int layerPos, int neuronPos = -1, int edgePos = -1); //if null gets the first neuron of the layer.
+		void updateWeights();
 
 	public:
 		
@@ -45,7 +43,7 @@ class NeuralNetwork{
 		//main functions for using model. 
 		void build(); //puts the network together
 
-		//need implemented train and prune
+		//needs tested.
 		void train(std::string path, int iterations); //path to csv of training data. will be automagically split into xDim and yDim based on inp and out layer sizes.
 		void prune(double variance);
 

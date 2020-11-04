@@ -116,15 +116,16 @@ void NeuralNetwork::disableEdge(int layerPos, int neuronPos, int edgePos){
 }
 
 
-void NeuralNetwork::activate(std::vector<double> input){
+std::vector<double> NeuralNetwork::activate(std::vector<double> input){
 	
 	int curLayer = 0, //which layer we are getting net weights from
 		curNeuron = 0, //which neuron we are on in current layer.
 		neuronsInLayer = layerSizes.at(0); //how many neurons in the current layer
 
 	//place to store net weights for the layer being activated. 
-	std::vector<double> finishedNets = input;
-	std::vector<double> computingNets;
+	std::vector<double> finishedNets = input,
+						computingNets,
+						output;
 	computingNets.assign(layerSizes.at(1), 0); 
 
 	for(std::vector<Neuron>::iterator neuron = neuralNetwork.begin(); neuron != neuralNetwork.end(); neuron++){	
@@ -132,8 +133,14 @@ void NeuralNetwork::activate(std::vector<double> input){
 		//if setting a input neuron's value dont call any activation function.
 		if(curLayer == 0)
 			(*neuron).value = finishedNets.at(curNeuron);
-		else
+		else{
 			(*neuron).value =layerActivations.at(curLayer-1).callFunction(finishedNets.at(curNeuron));
+			(*neuron).derivativeValue =layerActivations.at(curLayer-1).callDerivative(finishedNets.at(curNeuron));
+
+			if(curLayer == layerSizes.size() - 1 ){
+				output.push_back((*neuron).value);
+			}
+		}
 	
 		if(curLayer < layerSizes.size() - 1){ //collects net weights up until the next to last layer. because no point doing it for the output layer.
 			//for loop for each edge of the current neuron we are on.
@@ -158,6 +165,8 @@ void NeuralNetwork::activate(std::vector<double> input){
 		else
 			curNeuron++;
 	}
+	
+	return output;
 }
 
 
@@ -203,13 +212,17 @@ void NeuralNetwork::train(std::string path, int iterations){
   		xDim.push_back(xVals);
 		yDim.push_back(yVals);
 	}
-		/*
-		7. for how many iterations go over the data.
-		8. pass xDim with activate function
-		9. get out the actual values from output layer. 
-		10. caluclate error between actual and the target from yDim.
-		11. based on error update the neural networks weights.
-		*/
+
+	for(int i=0; i< iterations; i++){
+		for(std::vector<std::vector<double>>::iterator input = xDim.begin(); input != xDim.end(); input++){
+
+			 std::vector<double> output = this->activate(*input);
+
+			//calculate error with output and yDim.
+
+			//call update weights.
+		}		
+	}
 }
 
 
