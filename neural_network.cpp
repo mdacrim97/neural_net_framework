@@ -99,7 +99,7 @@ std::vector<double> NeuralNetwork::evaluate(std::vector<double> input){
 	for(std::vector<Neuron>::iterator neuron = neuralNetwork.begin(); neuron != neuralNetwork.end(); neuron++){	
 		
 		//if setting a input neuron's value dont call any activation function.
-		if(curLayer == 0) function 
+		if(curLayer == 0)
 			(*neuron).value = finishedNets.at(curNeuron);
 		else{
 			(*neuron).value =layerActivations.at(curLayer-1).callFunction(finishedNets.at(curNeuron));
@@ -178,15 +178,18 @@ void NeuralNetwork::train(std::string path, int iterations){
  	
 	
 	for(int i=0; i< iterations; i++){
+		int example = 0;
 		for(std::vector<std::vector<double>>::iterator input = xDim.begin(); input != xDim.end(); input++){
 
 			std::vector<double> output = this->evaluate(*input),
 								error;
 
-			for(int i=0; i < yDim.size(); i++)
-				error.push_back(yDim[i] - output[i]);
+			for(int j=0; j < yDim.size(); j++)
+				error.push_back(yDim.at(example).at(j)- output.at(j));
 
 			this->updateWeights(error);
+			
+			example++;
 		}		
 	}
 }

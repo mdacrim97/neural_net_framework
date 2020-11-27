@@ -6,25 +6,8 @@
 
 using namespace std;
 
-double foo(double x){
-		return x;
-}
-
-double fooPrime(double x){
-		return 1;
-}
-
-double bar(double x, double alpha=1){
-	retunr alpha * x;
-}
-
-double barPrime(double x, double alpha=1){
-	retunr alpha;
-}
 
 int main (int argc, char** argv){
-
-	ActivationFunction foo = activationFunction(foo, fooPrime, "foo", )
 
 	ActivationFunction swish = ActivationFunction("swish");
 	ActivationFunction relu = ActivationFunction("leakyReLu", 1.3);
@@ -37,7 +20,6 @@ int main (int argc, char** argv){
 	testNetwork.build();
 	//testNetwork.debug();
 	testNetwork.train("myfile.csv", 3);
-	testNetwork.evaluate()
 
 	cout << testNetwork.getOrder() << endl;
 	cout << testNetwork.getSize() << endl;
