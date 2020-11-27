@@ -29,7 +29,7 @@ void NeuralNetwork::debug(){
 	 
 	//print layer sizes vec
 	std::cout << "layer Sizes: ";
-	for(std::vector<int>::iterator it= layerSizes.begin(); it!= layerSizes.end(); it++){
+	for(std::vector<int>::iterator it = layerSizes.begin(); it!= layerSizes.end(); it++){
 		std:: cout << ' ' << *it;
 	}
 	std:: cout << std::endl;
@@ -84,39 +84,7 @@ void NeuralNetwork::build(){
 }
 
 
-void NeuralNetwork::enableEdge(int layerPos, int neuronPos, int edgePos){
-
-	if(layerPos >= layerSizes.size() - 1){
-		//throw invalid layer exception since there will be no edges to enable in the output layer
-	}
-
-	int position = 0;
-	for(std::vector<int>::iterator it = layerSizes.begin(); it != layerSizes.begin() + layerPos; it++)
-		position += *it;
-	position += neuronPos;
-
-	*((neuralNetwork.at(position)).edges.at(edgePos)) = randDouble();
-
-}
-
-
-void NeuralNetwork::disableEdge(int layerPos, int neuronPos, int edgePos){
-
-	if(layerPos >= layerSizes.size() - 1){
-		//throw invalid layer exception since there will be no edges to enable in the output layer
-	}
-
-	int position = 0;
-	for(std::vector<int>::iterator it = layerSizes.begin(); it != layerSizes.begin() + layerPos; it++)
-		position += *it;
-	position += neuronPos;
-
-	(neuralNetwork.at(position)).edges.at(edgePos) = nullptr;
-
-}
-
-
-std::vector<double> NeuralNetwork::activate(std::vector<double> input){
+std::vector<double> NeuralNetwork::evaluate(std::vector<double> input){
 	
 	int curLayer = 0, //which layer we are getting net weights from
 		curNeuron = 0, //which neuron we are on in current layer.
@@ -131,7 +99,7 @@ std::vector<double> NeuralNetwork::activate(std::vector<double> input){
 	for(std::vector<Neuron>::iterator neuron = neuralNetwork.begin(); neuron != neuralNetwork.end(); neuron++){	
 		
 		//if setting a input neuron's value dont call any activation function.
-		if(curLayer == 0)
+		if(curLayer == 0) function 
 			(*neuron).value = finishedNets.at(curNeuron);
 		else{
 			(*neuron).value =layerActivations.at(curLayer-1).callFunction(finishedNets.at(curNeuron));
@@ -167,11 +135,6 @@ std::vector<double> NeuralNetwork::activate(std::vector<double> input){
 	}
 	
 	return output;
-}
-
-
-void NeuralNetwork::updateWeights(){
-
 }
 
 
@@ -212,18 +175,27 @@ void NeuralNetwork::train(std::string path, int iterations){
   		xDim.push_back(xVals);
 		yDim.push_back(yVals);
 	}
-
+ 	
+	
 	for(int i=0; i< iterations; i++){
 		for(std::vector<std::vector<double>>::iterator input = xDim.begin(); input != xDim.end(); input++){
 
-			 std::vector<double> output = this->activate(*input);
+			std::vector<double> output = this->evaluate(*input),
+								error;
 
-			//calculate error with output and yDim.
+			for(int i=0; i < yDim.size(); i++)
+				error.push_back(yDim[i] - output[i]);
 
-			//call update weights.
+			this->updateWeights(error);
 		}		
 	}
 }
+
+void NeuralNetwork::updateWeights(std::vector<double> error){
+
+}
+
+
 
 
 void NeuralNetwork::prune(double variance){
@@ -232,6 +204,37 @@ void NeuralNetwork::prune(double variance){
 		for(std::vector<double*>::iterator edge = (*neuron).edges.begin(); edge != (*neuron).edges.end(); edge++)
 			if(0.0 - variance < **edge && **edge < 0.0 + variance)
 				*edge = nullptr; 
+}
+
+void NeuralNetwork::enableEdge(int layerPos, int neuronPos, int edgePos){
+
+	if(layerPos >= layerSizes.size() - 1){
+		//throw invalid layer exception since there will be no edges to enable in the output layer
+	}
+
+	int position = 0;
+	for(std::vector<int>::iterator it = layerSizes.begin(); it != layerSizes.begin() + layerPos; it++)
+		position += *it;
+	position += neuronPos;
+
+	*((neuralNetwork.at(position)).edges.at(edgePos)) = randDouble();
+
+}
+
+
+void NeuralNetwork::disableEdge(int layerPos, int neuronPos, int edgePos){
+
+	if(layerPos >= layerSizes.size() - 1){
+		//throw invalid layer exception since there will be no edges to enable in the output layer
+	}
+
+	int position = 0;
+	for(std::vector<int>::iterator it = layerSizes.begin(); it != layerSizes.begin() + layerPos; it++)
+		position += *it;
+	position += neuronPos;
+
+	(neuralNetwork.at(position)).edges.at(edgePos) = nullptr;
+
 }
 
 
