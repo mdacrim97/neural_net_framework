@@ -22,37 +22,37 @@ ActivationFunction::ActivationFunction(std::string function, double alpha){
 	if(function.compare("sigmoid") == 0){
 		this->function.oneArg = sigmoid;
 		this->derivative.oneArg = sigmoidDerivative;
-		paramCount = 1;
+		this->paramCount = 1;
 	}
 	else if(function.compare("linear") == 0){
 		this->function.twoArg = linear;
 		this->function.twoArg = linearDerivative;
-		paramCount = 2;
+		this->paramCount = 2;
 	}
 	else if(function.compare("elu") == 0){
 		this->function.twoArg = elu;
 		this->derivative.twoArg = eluDerivative;
-		paramCount = 2;
+		this->paramCount = 2;
 	}
 	else if(function.compare("reLu") == 0){
 		this->function.oneArg = reLu;
 		this->function.oneArg = reLuDerivative;	
-		paramCount = 1;	
+		this->paramCount = 1;	
 	}
 	else if(function.compare("leaky_reLu") == 0){
 		this->function.twoArg = leakyReLu;
 		this->derivative.twoArg = leakyReLuDerivative;	
-		paramCount = 2;
+		this->paramCount = 2;
 	}
 	else if(function.compare("tanh") == 0){
 		this->function.oneArg = tanh;
 		this->derivative.oneArg = tanhDerivative;
-		paramCount = 1;
+		this->paramCount = 1;
 	}
 	else if(function.compare("swish") == 0){
 		this->function.oneArg = swish;
 		this->derivative.oneArg = swishDerivative;
-		paramCount = 1;	
+		this->paramCount = 1;	
 	}
 	else{
 		  //need to throw custom exception here
@@ -68,7 +68,7 @@ std::string ActivationFunction::getName(){
 }
 
 int ActivationFunction::getParamCount(){
-	return paramCount;
+	return this->paramCount;
 }
 
 double ActivationFunction::callFunction(double x){

@@ -85,31 +85,37 @@ void NeuralNetwork::build(){
 
 
 std::vector<double> NeuralNetwork::evaluate(std::vector<double> input){
-	
+				
+
 	int curLayer = 0, //which layer we are getting net weights from
 		curNeuron = 0, //which neuron we are on in current layer.
 		neuronsInLayer = layerSizes.at(0); //how many neurons in the current layer
+
+	
 
 	//place to store net weights for the layer being activated. 
 	std::vector<double> finishedNets = input,
 						computingNets,
 						output;
 	computingNets.assign(layerSizes.at(1), 0); 
-
-	for(std::vector<Neuron>::iterator neuron = neuralNetwork.begin(); neuron != neuralNetwork.end(); neuron++){	
+	
+	for(std::vector<Neuron>::iterator neuron = neuralNetwork.begin(); neuron != neuralNetwork.end(); neuron++){
 		
 		//if setting a input neuron's value dont call any activation function.
 		if(curLayer == 0)
 			(*neuron).value = finishedNets.at(curNeuron);
 		else{
-			(*neuron).value =layerActivations.at(curLayer-1).callFunction(finishedNets.at(curNeuron));
-			(*neuron).derivativeValue =layerActivations.at(curLayer-1).callDerivative(finishedNets.at(curNeuron));
+
+			(*neuron).value = layerActivations.at(curLayer-1).callFunction(finishedNets.at(curNeuron));
+			(*neuron).derivativeValue = layerActivations.at(curLayer-1).callDerivative(finishedNets.at(curNeuron));
 
 			if(curLayer == layerSizes.size() - 1 ){
 				output.push_back((*neuron).value);
+				if(curNeuron == neuronsInLayer-1)
+					return output;
 			}
 		}
-	
+
 		if(curLayer < layerSizes.size() - 1){ //collects net weights up until the next to last layer. because no point doing it for the output layer.
 			//for loop for each edge of the current neuron we are on.
 			int edgeCount = (*neuron).edges.size();
@@ -133,8 +139,6 @@ std::vector<double> NeuralNetwork::evaluate(std::vector<double> input){
 		else
 			curNeuron++;
 	}
-	
-	return output;
 }
 
 
@@ -181,6 +185,7 @@ void NeuralNetwork::train(std::string path, int iterations){
 		int example = 0;
 		for(std::vector<std::vector<double>>::iterator input = xDim.begin(); input != xDim.end(); input++){
 
+			/*
 			std::vector<double> output = this->evaluate(*input),
 								error;
 
@@ -188,6 +193,7 @@ void NeuralNetwork::train(std::string path, int iterations){
 				error.push_back(yDim.at(example).at(j)- output.at(j));
 
 			this->updateWeights(error);
+			*/
 			
 			example++;
 		}		
@@ -249,9 +255,11 @@ int NeuralNetwork::getOrder(){
 int NeuralNetwork::getSize(){
 
 	int size = 0;
-	for(std::vector<Neuron>::iterator it = neuralNetwork.begin(); it != neuralNetwork.end(); it++ )
-		size += it->edges.size();
-
+	for(std::vector<Neuron>::iterator neuron = neuralNetwork.begin(); neuron != neuralNetwork.end(); neuron++ )
+		for(std::vector<double*>::iterator edge = (*neuron).edges.begin();edge != (*neuron).edges.end() ; edge++){		
+			if(*edge != nullptr)
+				size++;
+		}
 	return size;
 }
 
