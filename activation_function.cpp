@@ -19,43 +19,45 @@ ActivationFunction::ActivationFunction(double (*pActivation)(double, double), do
 
 ActivationFunction::ActivationFunction(std::string function, double alpha){
 
-	if(function.compare("sigmoid") == 0){
+	if(function == "sigmoid"){
 		this->function.oneArg = sigmoid;
 		this->derivative.oneArg = sigmoidDerivative;
 		this->paramCount = 1;
 	}
-	else if(function.compare("linear") == 0){
+	else if(function == "linear"){
 		this->function.twoArg = linear;
-		this->function.twoArg = linearDerivative;
+		this->derivative.twoArg = linearDerivative;
 		this->paramCount = 2;
+		std::cout << "in linear if" << std::endl;
 	}
-	else if(function.compare("elu") == 0){
+	else if(function == "elu"){
 		this->function.twoArg = elu;
 		this->derivative.twoArg = eluDerivative;
 		this->paramCount = 2;
 	}
-	else if(function.compare("reLu") == 0){
+	else if(function == "reLu"){
 		this->function.oneArg = reLu;
-		this->function.oneArg = reLuDerivative;	
+		this->derivative.oneArg = reLuDerivative;	
 		this->paramCount = 1;	
 	}
-	else if(function.compare("leaky_reLu") == 0){
+	else if(function == "leaky_relu"){
 		this->function.twoArg = leakyReLu;
 		this->derivative.twoArg = leakyReLuDerivative;	
 		this->paramCount = 2;
 	}
-	else if(function.compare("tanh") == 0){
+	else if(function == "tanh"){
 		this->function.oneArg = tanh;
 		this->derivative.oneArg = tanhDerivative;
 		this->paramCount = 1;
 	}
-	else if(function.compare("swish") == 0){
+	else if(function == "swish"){
 		this->function.oneArg = swish;
 		this->derivative.oneArg = swishDerivative;
 		this->paramCount = 1;	
 	}
 	else{
 		  //need to throw custom exception here
+		std::cout << "shit fucked" << std::endl;
 	}
 
 	this->name = function;

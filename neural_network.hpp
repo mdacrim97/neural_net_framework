@@ -41,7 +41,7 @@ class NeuralNetwork{
 		void build(); //puts the network together
 		std::vector<double> evaluate(std::vector<double> input); //will activate each neuron in the network	
 		void train(std::string path, int iterations); //path to csv of training data. will be automagically split into xDim and yDim based on inp and out layer sizes.
-		void prune(double variance)
+		void prune(double variance);
 
 		//utility functions
 		void debug();

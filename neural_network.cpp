@@ -9,6 +9,7 @@ NeuralNetwork::NeuralNetwork(int layers[], int layersCount, ActivationFunction l
 	}
 }
 
+
 NeuralNetwork::~NeuralNetwork(){
 
 	//for each neuron delete each edge.
@@ -51,6 +52,7 @@ double randDouble(){
 	return random*range + (-1);
 }
 
+
 void NeuralNetwork::initializeWeights(Neuron *n, int edges){
 	
 	for(int i = 0; i< edges; i++){	
@@ -59,6 +61,7 @@ void NeuralNetwork::initializeWeights(Neuron *n, int edges){
 		n->edges.push_back(weight);
 	}
 }
+
 
 void NeuralNetwork::build(){
 
@@ -182,29 +185,30 @@ void NeuralNetwork::train(std::string path, int iterations){
  	
 	
 	for(int i=0; i< iterations; i++){
-		int example = 0;
-		for(std::vector<std::vector<double>>::iterator input = xDim.begin(); input != xDim.end(); input++){
 
-			/*
+		int example = 0;
+		std::cout << "Iteration " << i+1 << "/" << iterations << std::endl;
+		for(std::vector<std::vector<double>>::iterator input = xDim.begin(); input != xDim.end(); input++){
+			
+			
 			std::vector<double> output = this->evaluate(*input),
 								error;
-
-			for(int j=0; j < yDim.size(); j++)
+	
+			for(int j=0; j < yDim.at(example).size(); j++)
 				error.push_back(yDim.at(example).at(j)- output.at(j));
 
 			this->updateWeights(error);
-			*/
-			
+			error.clear();
 			example++;
+			
 		}		
 	}
 }
 
+
 void NeuralNetwork::updateWeights(std::vector<double> error){
 
 }
-
-
 
 
 void NeuralNetwork::prune(double variance){
@@ -214,6 +218,7 @@ void NeuralNetwork::prune(double variance){
 			if(0.0 - variance < **edge && **edge < 0.0 + variance)
 				*edge = nullptr; 
 }
+
 
 void NeuralNetwork::enableEdge(int layerPos, int neuronPos, int edgePos){
 
