@@ -6,6 +6,15 @@
 #include <cmath>
 #include <string>
 #include <iostream>
+#include <exception>
+
+struct FunctionNotDefinedException : public std::exception
+{
+	const char * what () const throw ()
+    {
+    	return "FunctionNotDefinedException thrown.";
+    }
+};
 
 class ActivationFunction{
 

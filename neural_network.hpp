@@ -9,6 +9,38 @@
 #include <iostream>
 #include "activation_function.hpp"
 
+struct NetworkNotBuiltException : public std::exception
+{
+	const char * what () const throw ()
+    {
+    	return "NetworkNotBuiltException thrown.";
+    }
+};
+
+struct InvalidLayerPositionException : public std::exception
+{
+	const char * what () const throw ()
+    {
+    	return "InvalidLayerPositionException thrown.";
+    }
+};
+
+struct InvalidNeuronPositionException : public std::exception
+{
+	const char * what () const throw ()
+    {
+    	return "InvalidNeuronPositionException thrown.";
+    }
+};
+
+struct InvalidEdgePositionException : public std::exception
+{
+	const char * what () const throw ()
+    {
+    	return "InvalidEdgePositionException thrown.";
+    }
+};
+
 struct Neuron{
 	double value,
 		   derivativeValue; 
@@ -25,11 +57,11 @@ class NeuralNetwork{
 		std::vector<Neuron> neuralNetwork; //adjacency list of all neurons.
 		bool built = false; //true if built
 		
-		//functions
 		void initializeWeights(Neuron *n, int edges);
-
-		//needs implemented
 		void updateWeights(std::vector<double> error);
+
+		void validateNetwork(int layerPos=-1, int neuronPos=-1, int edgePos=-1);//throws exception if something is wrong.
+		int getNeuronPosition(int layerPos, int neuronPos);
 
 	public:
 		

@@ -56,8 +56,7 @@ ActivationFunction::ActivationFunction(std::string function, double alpha){
 		this->paramCount = 1;	
 	}
 	else{
-		  //need to throw custom exception here
-		std::cout << "shit fucked" << std::endl;
+		throw FunctionNotDefinedException();
 	}
 
 	this->name = function;

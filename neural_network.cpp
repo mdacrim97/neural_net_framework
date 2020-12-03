@@ -12,6 +12,8 @@ NeuralNetwork::NeuralNetwork(int layers[], int layersCount, ActivationFunction l
 
 NeuralNetwork::~NeuralNetwork(){
 
+	this->validateNetwork();
+
 	//for each neuron delete each edge.
 	for(std::vector<Neuron>::iterator neuron = neuralNetwork.begin(); neuron!=neuralNetwork.end(); neuron++)
 		for(std::vector<double*>::iterator edge = neuron->edges.begin(); edge != neuron->edges.end(); edge++)
@@ -44,6 +46,34 @@ void NeuralNetwork::debug(){
 }
 
 
+int NeuralNetwork::getNeuronPosition(int layerPos, int neuronPos){
+
+	int position = 0;
+	for(std::vector<int>::iterator it = layerSizes.begin(); it != layerSizes.begin() + layerPos; it++)
+		position += *it;
+	position += neuronPos;
+	
+	return position;
+}
+
+
+void NeuralNetwork::validateNetwork(int layerPos, int neuronPos, int edgePos){
+
+	if(built == false)
+		throw NetworkNotBuiltException();
+
+	else if(layerPos > layerSizes.size()-1)
+		throw InvalidLayerPositionException();
+
+	else if(neuronPos > layerSizes.at(layerPos)-1)
+		throw InvalidNeuronPositionException();
+
+	int position = this->getNeuronPosition(layerPos, neuronPos);
+	if(edgePos > neuralNetwork.at(position).edges.size()-1)
+		throw InvalidEdgePositionException();
+}
+
+
 //for initializing weights
 double randDouble(){
 
@@ -68,7 +98,7 @@ void NeuralNetwork::build(){
 	//each layer
 	for(std::vector<int>::iterator it = layerSizes.begin(); it!= layerSizes.end(); it++){
 
-		//calc how many neurons in the next layer for amount of edges needed.
+		//how many neurons in the next layer for amount of edges needed.
 		int neuronEdges = *(next(it));
 
 		//each neuron that layer needs.
@@ -88,7 +118,8 @@ void NeuralNetwork::build(){
 
 
 std::vector<double> NeuralNetwork::evaluate(std::vector<double> input){
-				
+
+	this->validateNetwork();
 
 	int curLayer = 0, //which layer we are getting net weights from
 		curNeuron = 0, //which neuron we are on in current layer.
@@ -147,10 +178,11 @@ std::vector<double> NeuralNetwork::evaluate(std::vector<double> input){
 
 void NeuralNetwork::train(std::string path, int iterations){
 
+	this->validateNetwork();		
+
 	//Read in csv into xDim and yDim vectors to hold the training data.
 	std::vector<std::vector<double>> xDim;
 	std::vector<std::vector<double>> yDim;	
-
 
 	std::ifstream file(path);
 	while(file){
@@ -208,10 +240,45 @@ void NeuralNetwork::train(std::string path, int iterations){
 
 void NeuralNetwork::updateWeights(std::vector<double> error){
 
+	const double stepSize = 0.01;
+	
+	std::vector<Neuron>::reverse_iterator neuron = neuralNetwork.rbegin() + layerSizes.at(layerSizes.size()-1);
+	int curLayer = layerSizes.size()-2,//start at last hidden layer
+		curNeuron = layerSizes.at(curLayer) - 1; //start at last neuron in layer
+	
+	for(neuron; neuron != neuralNetwork.rend(); neuron++){
+		int curEdge = 0;
+		for(std::vector<double*>::iterator edge = (*neuron).edges.begin(); edge != (*neuron).edges.end(); edge++){
+
+			if(curLayer == layerSizes.size() - 2){//for back propogating between hidden and output
+				**edge = **edge + stepSize * (*neuron).value * error.at(curEdge) * (*neuron).derivativeValue;
+				std::cout << "hidden and output" << std::endl;
+			}
+			else if(curLayer == 0){//back prop for between input and hidden
+				std::cout << "input and hidden" << std::endl;
+			}
+			else{ //for between hidden and hidden
+				std::cout << "hidden and hidden" << std::endl;
+			}
+			curEdge++;
+		}
+
+		if(curNeuron == 0){//final neuron of layer. does updates to vairables keeping track of location in the graph
+			curLayer--;
+			curNeuron = layerSizes.at(curLayer);
+		}
+		else
+			curNeuron--;
+	}
 }
 
 
 void NeuralNetwork::prune(double variance){
+
+	this->validateNetwork();
+
+	if(built == false)
+		throw NetworkNotBuiltException();
 
 	for(std::vector<Neuron>::iterator neuron = neuralNetwork.begin(); neuron != neuralNetwork.end(); neuron++)
 		for(std::vector<double*>::iterator edge = (*neuron).edges.begin(); edge != (*neuron).edges.end(); edge++)
@@ -222,42 +289,30 @@ void NeuralNetwork::prune(double variance){
 
 void NeuralNetwork::enableEdge(int layerPos, int neuronPos, int edgePos){
 
-	if(layerPos >= layerSizes.size() - 1){
-		//throw invalid layer exception since there will be no edges to enable in the output layer
-	}
-
-	int position = 0;
-	for(std::vector<int>::iterator it = layerSizes.begin(); it != layerSizes.begin() + layerPos; it++)
-		position += *it;
-	position += neuronPos;
-
+	this->validateNetwork(layerPos, neuronPos, edgePos);
+	int position = this->getNeuronPosition(layerPos, neuronPos);
 	*((neuralNetwork.at(position)).edges.at(edgePos)) = randDouble();
-
 }
 
 
 void NeuralNetwork::disableEdge(int layerPos, int neuronPos, int edgePos){
 
-	if(layerPos >= layerSizes.size() - 1){
-		//throw invalid layer exception since there will be no edges to enable in the output layer
-	}
-
-	int position = 0;
-	for(std::vector<int>::iterator it = layerSizes.begin(); it != layerSizes.begin() + layerPos; it++)
-		position += *it;
-	position += neuronPos;
-
+	this->validateNetwork(layerPos, neuronPos, edgePos);	
+	int position = this->getNeuronPosition(layerPos, neuronPos);
 	(neuralNetwork.at(position)).edges.at(edgePos) = nullptr;
-
 }
 
 
 int NeuralNetwork::getOrder(){
+
+	this->validateNetwork();
 	return neuralNetwork.size();
 }
 
 
 int NeuralNetwork::getSize(){
+
+	this->validateNetwork();
 
 	int size = 0;
 	for(std::vector<Neuron>::iterator neuron = neuralNetwork.begin(); neuron != neuralNetwork.end(); neuron++ )
@@ -270,6 +325,8 @@ int NeuralNetwork::getSize(){
 
 
 int NeuralNetwork::getLayerCount(){ //returns number of layers including input and output layer
+	
 	return layerSizes.size();
 }
+
 

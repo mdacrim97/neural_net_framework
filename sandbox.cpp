@@ -13,10 +13,6 @@ int main (int argc, char** argv){
 	ActivationFunction elu = ActivationFunction("elu", 1.3);
 	ActivationFunction leaky = ActivationFunction("leaky_relu", 1.2);
 
-
-
-
-
 	//test neural network
 	int layerSizes[4] = {2, 4, 2, 1};
 	ActivationFunction layerFunctions[3] = {swish, leaky, elu};
