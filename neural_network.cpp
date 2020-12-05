@@ -62,14 +62,14 @@ void NeuralNetwork::validateNetwork(int layerPos, int neuronPos, int edgePos){
 	if(built == false)
 		throw NetworkNotBuiltException();
 
-	else if(layerPos > layerSizes.size()-1)
+	else if(layerPos > layerSizes.size()-1 || layerPos < 0)
 		throw InvalidLayerPositionException();
 
-	else if(neuronPos > layerSizes.at(layerPos)-1)
+	else if(neuronPos > layerSizes.at(layerPos)-1 || neuronPos < 0)
 		throw InvalidNeuronPositionException();
 
 	int position = this->getNeuronPosition(layerPos, neuronPos);
-	if(edgePos > neuralNetwork.at(position).edges.size()-1)
+	if(edgePos > neuralNetwork.at(position).edges.size()-1 || edgePos < 0)
 		throw InvalidEdgePositionException();
 }
 

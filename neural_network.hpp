@@ -60,7 +60,7 @@ class NeuralNetwork{
 		void initializeWeights(Neuron *n, int edges);
 		void updateWeights(std::vector<double> error);
 
-		void validateNetwork(int layerPos=-1, int neuronPos=-1, int edgePos=-1);//throws exception if something is wrong.
+		void validateNetwork(int layerPos=0, int neuronPos=0, int edgePos=0);//throws exception if something is not correct.
 		int getNeuronPosition(int layerPos, int neuronPos);
 
 	public:
