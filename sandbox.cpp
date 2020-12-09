@@ -20,20 +20,7 @@ int main (int argc, char** argv){
 	NeuralNetwork testNetwork = NeuralNetwork(layerSizes, 4, layerFunctions);
 	testNetwork.build();
 
-	testNetwork.train("myfile.csv", 3);
-
-	vector<double> vec;
-	vec.assign(2,1);
-	
-	vector<double> results = testNetwork.evaluate(vec);
-	cout << "results: " << results.at(0) << endl;
-	cout << testNetwork.getSize() << endl;
-
-	testNetwork.prune(0.03);
-
-	results = testNetwork.evaluate(vec);
-	cout << "results: " << results.at(0) << endl;
-	cout << testNetwork.getSize() << endl;
+	testNetwork.train("myfile.csv", 50);
 
 	return 0;
 }

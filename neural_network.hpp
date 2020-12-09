@@ -43,7 +43,8 @@ struct InvalidEdgePositionException : public std::exception
 
 struct Neuron{
 	double value,
-		   derivativeValue; 
+		   derivativeValue,
+		   delta; 
 	std::vector<double*> edges; // if edges[i] == nullptr it is not connected.
 };
 
@@ -58,7 +59,8 @@ class NeuralNetwork{
 		bool built = false; //true if built
 		
 		void initializeWeights(Neuron *n, int edges);
-		void updateWeights(std::vector<double> error);
+		void setDeltas(std::vector<double> error);
+		void updateWeights();
 
 		void validateNetwork(int layerPos=0, int neuronPos=0, int edgePos=0);//throws exception if something is not correct.
 		int getNeuronPosition(int layerPos, int neuronPos);

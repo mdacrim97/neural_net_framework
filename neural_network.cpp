@@ -154,7 +154,7 @@ std::vector<double> NeuralNetwork::evaluate(std::vector<double> input){
 			//for loop for each edge of the current neuron we are on.
 			int edgeCount = (*neuron).edges.size();
 			for(int i=0; i < edgeCount; i++){
-				if((*neuron).edges.at(i) == nullptr) //dont add into net weights if edge is not connected.
+				if((*neuron).edges.at(i) == nullptr) //dont add into net weights if edge is not connected
 					continue; 
 				else
 					computingNets[i] += (*neuron).value *  *(*neuron).edges.at(i);
@@ -222,14 +222,16 @@ void NeuralNetwork::train(std::string path, int iterations){
 		std::cout << "Iteration " << i+1 << "/" << iterations << std::endl;
 		for(std::vector<std::vector<double>>::iterator input = xDim.begin(); input != xDim.end(); input++){
 			
-			
 			std::vector<double> output = this->evaluate(*input),
 								error;
+
+				std::cout << "results: " << output.at(0) << std::endl;
 	
 			for(int j=0; j < yDim.at(example).size(); j++)
 				error.push_back(yDim.at(example).at(j)- output.at(j));
 
-			this->updateWeights(error);
+			this->setDeltas(error);
+			this->updateWeights();
 			error.clear();
 			example++;
 			
@@ -237,39 +239,91 @@ void NeuralNetwork::train(std::string path, int iterations){
 	}
 }
 
+void NeuralNetwork::setDeltas(std::vector<double> error){
 
-void NeuralNetwork::updateWeights(std::vector<double> error){
+	int curLayer = layerSizes.size() - 1, //start on output layer
+		curNeuron = layerSizes.at(curLayer)-1, //start at last neuron of output layer
+		curEdge,
+		deltaPos;
+	
+	double  delta,
+			summation;
 
-	const double stepSize = 0.01;
+
 	
-	std::vector<Neuron>::reverse_iterator neuron = neuralNetwork.rbegin() + layerSizes.at(layerSizes.size()-1);
-	int curLayer = layerSizes.size()-2,//start at last hidden layer
-		curNeuron = layerSizes.at(curLayer) - 1; //start at last neuron in layer
-	
+
+	std::vector<Neuron>::reverse_iterator neuron = neuralNetwork.rbegin();
 	for(neuron; neuron != neuralNetwork.rend(); neuron++){
-		int curEdge = 0;
-		for(std::vector<double*>::iterator edge = (*neuron).edges.begin(); edge != (*neuron).edges.end(); edge++){
-
-			if(curLayer == layerSizes.size() - 2){//for back propogating between hidden and output
-				**edge = **edge + stepSize * (*neuron).value * error.at(curEdge) * (*neuron).derivativeValue;
-				std::cout << "hidden and output" << std::endl;
+		
+		summation = 0;
+		
+		if(curLayer == layerSizes.size() - 1){
+ 			(*neuron).delta = (*neuron).derivativeValue * error.at(curNeuron);
+		}
+		else{
+			curEdge = 0; //also is which neuron to go to.
+			std::vector<double*>::iterator edge = (*neuron).edges.begin();
+			for(edge; edge != (*neuron).edges.end(); edge++){
+				
+				if(*edge != nullptr){
+					deltaPos = getNeuronPosition(curLayer + 1 , curEdge);
+					summation += **edge * neuralNetwork.at(deltaPos).delta;
+				}
+				curEdge++;
 			}
-			else if(curLayer == 0){//back prop for between input and hidden
-				std::cout << "input and hidden" << std::endl;
-			}
-			else{ //for between hidden and hidden
-				std::cout << "hidden and hidden" << std::endl;
-			}
-			curEdge++;
+			
+			(*neuron).delta = (*neuron).derivativeValue * summation;
 		}
 
-		if(curNeuron == 0){//final neuron of layer. does updates to vairables keeping track of location in the graph
+		if(curNeuron == 0){
 			curLayer--;
-			curNeuron = layerSizes.at(curLayer);
+			curNeuron = layerSizes.at(curLayer) - 1;
+
+			if(curLayer == 0) //done once input layer is hit.
+				return;
 		}
 		else
 			curNeuron--;
 	}
+
+}
+
+
+void NeuralNetwork::updateWeights(){
+
+	const double stepSize = 0.01;
+
+	int curLayer = 0, //start at first layer.
+		curNeuron = 0,
+		neuronsInLayer = layerSizes.at(curLayer),
+		curEdge,
+		deltaPos;
+	
+	//for loops for updating every edge's weight
+	std::vector<Neuron>::iterator neuron = neuralNetwork.begin();
+	for(neuron; neuron != neuralNetwork.end(); neuron++){
+
+		curEdge = 0;
+		std::vector<double*>::iterator edge = (*neuron).edges.begin();
+		for(edge; edge != (*neuron).edges.end(); edge++){
+			if(*edge != nullptr){
+				deltaPos = getNeuronPosition(curLayer+1, curEdge);
+				**edge = **edge + (stepSize * (*neuron).value * neuralNetwork.at(deltaPos).delta);
+			}
+			curEdge++;
+		}
+
+		if(curNeuron == neuronsInLayer - 1){
+			curLayer++;
+			curNeuron = 0;
+			neuronsInLayer = layerSizes.at(curLayer);
+
+			if(curLayer == layerSizes.size() - 1) //If in the output layer stop.
+				return;
+		}
+		else
+			curNeuron++;
+	}	
 }
 
 
