@@ -308,7 +308,15 @@ void NeuralNetwork::updateWeights(){
 		for(edge; edge != (*neuron).edges.end(); edge++){
 			if(*edge != nullptr){
 				deltaPos = getNeuronPosition(curLayer+1, curEdge);
-				**edge = **edge + (stepSize * (*neuron).value * neuralNetwork.at(deltaPos).delta);
+				double updatedWeight = **edge + (stepSize * (*neuron).value * neuralNetwork.at(deltaPos).delta);
+	
+				//keeps weight within [-1,1]
+				if(updatedWeight > 1)
+					**edge = 1;
+				else if(updatedWeight < -1)
+					**edge = -1;
+				else
+					**edge = updatedWeight;
 			}
 			curEdge++;
 		}
