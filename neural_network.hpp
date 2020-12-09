@@ -56,10 +56,11 @@ class NeuralNetwork{
 		std::vector<int> layerSizes; 
 		std::vector<ActivationFunction> layerActivations;
 		std::vector<Neuron> neuralNetwork; //adjacency list of all neurons.
-		bool built = false; //true if built
+		bool built = false;
 		
 		void initializeWeights(Neuron *n, int edges);
-		void setDeltas(std::vector<double> error);
+		void parseData(std::string path, std::vector<std::vector<double>> &xDim, std::vector<std::vector<double>> &yDim);
+		void backProp(std::vector<double> error);
 		void updateWeights();
 
 		void validateNetwork(int layerPos=0, int neuronPos=0, int edgePos=0);//throws exception if something is not correct.

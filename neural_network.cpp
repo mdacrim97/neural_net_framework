@@ -175,14 +175,7 @@ std::vector<double> NeuralNetwork::evaluate(std::vector<double> input){
 	}
 }
 
-
-void NeuralNetwork::train(std::string path, int iterations){
-
-	this->validateNetwork();		
-
-	//Read in csv into xDim and yDim vectors to hold the training data.
-	std::vector<std::vector<double>> xDim;
-	std::vector<std::vector<double>> yDim;	
+void NeuralNetwork::parseData(std::string path, std::vector<std::vector<double>> &xDim, std::vector<std::vector<double>> &yDim){
 
 	std::ifstream file(path);
 	while(file){
@@ -214,7 +207,18 @@ void NeuralNetwork::train(std::string path, int iterations){
   		xDim.push_back(xVals);
 		yDim.push_back(yVals);
 	}
- 	
+
+}
+
+void NeuralNetwork::train(std::string path, int iterations){
+
+	this->validateNetwork();		
+
+	//Read in csv into xDim and yDim vectors to hold the training data.
+	std::vector<std::vector<double>> xDim;
+	std::vector<std::vector<double>> yDim;	
+
+	this->parseData(path, xDim, yDim);
 	
 	for(int i=0; i< iterations; i++){
 
@@ -224,13 +228,11 @@ void NeuralNetwork::train(std::string path, int iterations){
 			
 			std::vector<double> output = this->evaluate(*input),
 								error;
-
-				std::cout << "results: " << output.at(0) << std::endl;
 	
 			for(int j=0; j < yDim.at(example).size(); j++)
 				error.push_back(yDim.at(example).at(j)- output.at(j));
 
-			this->setDeltas(error);
+			this->backProp(error);
 			this->updateWeights();
 			error.clear();
 			example++;
@@ -239,7 +241,8 @@ void NeuralNetwork::train(std::string path, int iterations){
 	}
 }
 
-void NeuralNetwork::setDeltas(std::vector<double> error){
+
+void NeuralNetwork::backProp(std::vector<double> error){
 
 	int curLayer = layerSizes.size() - 1, //start on output layer
 		curNeuron = layerSizes.at(curLayer)-1, //start at last neuron of output layer
@@ -247,10 +250,7 @@ void NeuralNetwork::setDeltas(std::vector<double> error){
 		deltaPos;
 	
 	double  delta,
-			summation;
-
-
-	
+			summation;	
 
 	std::vector<Neuron>::reverse_iterator neuron = neuralNetwork.rbegin();
 	for(neuron; neuron != neuralNetwork.rend(); neuron++){
