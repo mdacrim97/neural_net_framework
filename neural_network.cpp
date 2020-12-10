@@ -228,12 +228,11 @@ void NeuralNetwork::train(std::string path, int iterations){
 			
 			std::vector<double> output = this->evaluate(*input),
 								error;
-	
+
 			for(int j=0; j < yDim.at(example).size(); j++)
 				error.push_back(yDim.at(example).at(j)- output.at(j));
 
 			this->backProp(error);
-			this->updateWeights();
 			error.clear();
 			example++;
 			
@@ -250,7 +249,9 @@ void NeuralNetwork::backProp(std::vector<double> error){
 		deltaPos;
 	
 	double  delta,
-			summation;	
+			summation;
+
+	const double stepSize = 0.01;	
 
 	std::vector<Neuron>::reverse_iterator neuron = neuralNetwork.rbegin();
 	for(neuron; neuron != neuralNetwork.rend(); neuron++){
@@ -266,8 +267,26 @@ void NeuralNetwork::backProp(std::vector<double> error){
 			for(edge; edge != (*neuron).edges.end(); edge++){
 				
 				if(*edge != nullptr){
+
+					//calculate neuron's delta
+					
 					deltaPos = getNeuronPosition(curLayer + 1 , curEdge);
-					summation += **edge * neuralNetwork.at(deltaPos).delta;
+
+					if(curLayer != 0)
+						summation += **edge * neuralNetwork.at(deltaPos).delta;
+
+					//update the current edge's weight
+					double updatedWeight = **edge + (stepSize * (*neuron).value * neuralNetwork.at(deltaPos).delta);
+	
+					//keeps weight within [-1,1]
+					if(updatedWeight > 1)
+						**edge = 1;
+					else if(updatedWeight < -1)
+						**edge = -1;
+					else
+						**edge = updatedWeight;
+
+
 				}
 				curEdge++;
 			}
@@ -286,52 +305,6 @@ void NeuralNetwork::backProp(std::vector<double> error){
 			curNeuron--;
 	}
 
-}
-
-
-void NeuralNetwork::updateWeights(){
-
-	const double stepSize = 0.01;
-
-	int curLayer = 0, //start at first layer.
-		curNeuron = 0,
-		neuronsInLayer = layerSizes.at(curLayer),
-		curEdge,
-		deltaPos;
-	
-	//for loops for updating every edge's weight
-	std::vector<Neuron>::iterator neuron = neuralNetwork.begin();
-	for(neuron; neuron != neuralNetwork.end(); neuron++){
-
-		curEdge = 0;
-		std::vector<double*>::iterator edge = (*neuron).edges.begin();
-		for(edge; edge != (*neuron).edges.end(); edge++){
-			if(*edge != nullptr){
-				deltaPos = getNeuronPosition(curLayer+1, curEdge);
-				double updatedWeight = **edge + (stepSize * (*neuron).value * neuralNetwork.at(deltaPos).delta);
-	
-				//keeps weight within [-1,1]
-				if(updatedWeight > 1)
-					**edge = 1;
-				else if(updatedWeight < -1)
-					**edge = -1;
-				else
-					**edge = updatedWeight;
-			}
-			curEdge++;
-		}
-
-		if(curNeuron == neuronsInLayer - 1){
-			curLayer++;
-			curNeuron = 0;
-			neuronsInLayer = layerSizes.at(curLayer);
-
-			if(curLayer == layerSizes.size() - 1) //If in the output layer stop.
-				return;
-		}
-		else
-			curNeuron++;
-	}	
 }
 
 
