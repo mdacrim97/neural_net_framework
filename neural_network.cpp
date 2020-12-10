@@ -271,12 +271,13 @@ void NeuralNetwork::backProp(std::vector<double> error){
 					//calculate neuron's delta
 					
 					deltaPos = getNeuronPosition(curLayer + 1 , curEdge);
+					delta = neuralNetwork.at(deltaPos).delta;
 
 					if(curLayer != 0)
-						summation += **edge * neuralNetwork.at(deltaPos).delta;
+						summation += **edge * delta;
 
 					//update the current edge's weight
-					double updatedWeight = **edge + (stepSize * (*neuron).value * neuralNetwork.at(deltaPos).delta);
+					double updatedWeight = **edge + (stepSize * (*neuron).value * delta);
 	
 					//keeps weight within [-1,1]
 					if(updatedWeight > 1)
@@ -285,7 +286,6 @@ void NeuralNetwork::backProp(std::vector<double> error){
 						**edge = -1;
 					else
 						**edge = updatedWeight;
-
 
 				}
 				curEdge++;
