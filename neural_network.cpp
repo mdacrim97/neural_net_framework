@@ -1,12 +1,15 @@
 #include "neural_network.hpp"
 
 
-NeuralNetwork::NeuralNetwork(int layers[], int layersCount, ActivationFunction layerActivations[]){
+NeuralNetwork::NeuralNetwork(int layers[], int layersCount, ActivationFunction layerActivations[], std::string name){
+
 	for(int i=0; i < layersCount; i++){
 		this->layerSizes.push_back(layers[i]);
 		if(i < layersCount-1)
 			this->layerActivations.push_back(layerActivations[i]);
 	}
+
+	this->name = name;
 }
 
 
@@ -117,14 +120,12 @@ void NeuralNetwork::build(){
 }
 
 
-std::vector<double> NeuralNetwork::evaluate(std::vector<double> input){
-
+double NeuralNetwork::evaluate(std::vector<double> input){
 	this->validateNetwork();
 
 	int curLayer = 0, //which layer we are getting net weights from
 		curNeuron = 0, //which neuron we are on in current layer.
 		neuronsInLayer = layerSizes.at(0); //how many neurons in the current layer
-
 	
 
 	//place to store net weights for the layer being activated. 
@@ -132,39 +133,36 @@ std::vector<double> NeuralNetwork::evaluate(std::vector<double> input){
 						computingNets,
 						output;
 	computingNets.assign(layerSizes.at(1), 0); 
-	
-	for(std::vector<Neuron>::iterator neuron = neuralNetwork.begin(); neuron != neuralNetwork.end(); neuron++){
-		
-		//if setting a input neuron's value dont call any activation function.
-		if(curLayer == 0)
-			(*neuron).value = finishedNets.at(curNeuron);
-		else{
 
+	for(std::vector<Neuron>::iterator neuron = neuralNetwork.begin(); neuron != neuralNetwork.end(); neuron++){
+
+		//if setting a input neuron's value dont call any activation function.
+		if(curLayer == 0){
+			(*neuron).value = finishedNets.at(curNeuron);
+		}
+		else{
 			(*neuron).value = layerActivations.at(curLayer-1).callFunction(finishedNets.at(curNeuron));
 			(*neuron).derivativeValue = layerActivations.at(curLayer-1).callDerivative(finishedNets.at(curNeuron));
 
-			if(curLayer == layerSizes.size() - 1 ){
+			if(curLayer == layerSizes.size() - 1 )//if an output neuron place it in the output vector
 				output.push_back((*neuron).value);
-				if(curNeuron == neuronsInLayer-1)
-					return output;
-			}
 		}
-
-		if(curLayer < layerSizes.size() - 1){ //collects net weights up until the next to last layer. because no point doing it for the output layer.
-			//for loop for each edge of the current neuron we are on.
+		//calculates net weights
+		if(curLayer < layerSizes.size() - 1){ //collects net weights up until the next to last layer.
 			int edgeCount = (*neuron).edges.size();
 			for(int i=0; i < edgeCount; i++){
-				if((*neuron).edges.at(i) == nullptr) //dont add into net weights if edge is not connected
-					continue; 
-				else
+				if((*neuron).edges.at(i) != nullptr) //dont add into net weights if edge is not connected
 					computingNets[i] += (*neuron).value *  *(*neuron).edges.at(i);
 			}
 		}
 		
 		if(curNeuron  == neuronsInLayer - 1 ){//reached the end of this layer
-			curLayer++; //moving on to the next layer
-			curNeuron = 0; //reset to the first neuron of that layer
-			neuronsInLayer = layerSizes.at(curLayer); //get how many neurons are in this layer
+		
+			if(curLayer == layerSizes.size() - 1 )
+				continue;
+			curLayer++;
+			curNeuron = 0;
+			neuronsInLayer = layerSizes.at(curLayer);
 			
 			finishedNets = computingNets; //moved the now completely calcualted net weights to its vector and resize the vector for the computing netweights.
 			if(curLayer < layerSizes.size() - 1)
@@ -173,9 +171,28 @@ std::vector<double> NeuralNetwork::evaluate(std::vector<double> input){
 		else
 			curNeuron++;
 	}
+
+
+	//check if regression
+	if(layerSizes.back() == 1)
+		return output.at(0);
+
+	//if not find which classifcation was chosen.
+	double max = output.at(0);
+	int maxPos = 0;
+
+	for(int i=1; i< output.size(); i++){
+		if(max < output.at(i)){
+			max = output.at(i);
+			maxPos = i;
+		}														
+	}
+	
+	return maxPos + 1; //return which class was chosen	
+
 }
 
-void NeuralNetwork::parseData(std::string path, std::vector<std::vector<double>> &xDim, std::vector<std::vector<double>> &yDim){
+void NeuralNetwork::parseData(std::string path, std::vector<std::vector<double>> &xDim, std::vector<double> &yDim){
 
 	std::ifstream file(path);
 	while(file){
@@ -186,7 +203,6 @@ void NeuralNetwork::parseData(std::string path, std::vector<std::vector<double>>
 	
 	  	std::istringstream ss(line);
 	  	std::vector<double> xVals;
-		std::vector<double> yVals;
 
 		int i = 1;
 		int xSize = layerSizes.at(0); //get how many values based on how many input neurons.
@@ -200,13 +216,14 @@ void NeuralNetwork::parseData(std::string path, std::vector<std::vector<double>>
 			if(i<= xSize)
 	    		xVals.push_back(stod(s));
 			else
-				yVals.push_back(stod(s));
+				yDim.push_back(stod(s));
 			i++;
 	  	}
 		
   		xDim.push_back(xVals);
-		yDim.push_back(yVals);
 	}
+
+	file.close();
 
 }
 
@@ -216,7 +233,7 @@ void NeuralNetwork::train(std::string path, int iterations){
 
 	//Read in csv into xDim and yDim vectors to hold the training data.
 	std::vector<std::vector<double>> xDim;
-	std::vector<std::vector<double>> yDim;	
+	std::vector<double> yDim;	
 
 	this->parseData(path, xDim, yDim);
 	
@@ -226,11 +243,17 @@ void NeuralNetwork::train(std::string path, int iterations){
 		std::cout << "Iteration " << i+1 << "/" << iterations << std::endl;
 		for(std::vector<std::vector<double>>::iterator input = xDim.begin(); input != xDim.end(); input++){
 			
-			std::vector<double> output = this->evaluate(*input),
-								error;
+			double output = this->evaluate(*input);
+			std::vector<double> error;
 
-			for(int j=0; j < yDim.at(example).size(); j++)
-				error.push_back(yDim.at(example).at(j)- output.at(j));
+
+			if(layerSizes.back() == 1){
+				error.push_back(yDim.at(example) - output);
+			}
+			else{
+				//setup error vector if its a classification network
+
+			}
 
 			this->backProp(error);
 			error.clear();
@@ -322,6 +345,49 @@ void NeuralNetwork::prune(double variance){
 }
 
 
+void NeuralNetwork::saveModel(){
+
+	unsigned long long irVer = 3;
+	//opset Ids here
+	std::string producerName = "alexCrim",
+				producerVer = "0.2",
+				domain = "2601:546:8101:b250:1cc7:2a48:2a55:9a4f";
+	unsigned long long modelVer = 666;
+
+	std::string	doc;
+	//graph structure
+	//metaData props
+	//train info [OPTIONAL]
+
+
+	std::fstream file(this->name+".onnx");
+	if(file.is_open()){
+		file << irVer << "\n";
+
+		
+		
+
+	}
+
+	file.close();	
+}
+
+
+void NeuralNetwork::loadModel(std::string path){
+
+	std::fstream file(path);
+
+	while(file){
+		//parse data
+		
+	}
+
+
+	file.close();
+	
+}
+
+
 void NeuralNetwork::enableEdge(int layerPos, int neuronPos, int edgePos){
 
 	this->validateNetwork(layerPos, neuronPos, edgePos);
@@ -363,5 +429,7 @@ int NeuralNetwork::getLayerCount(){ //returns number of layers including input a
 	
 	return layerSizes.size();
 }
+
+
 
 

@@ -52,6 +52,8 @@ struct Neuron{
 class NeuralNetwork{
 	
 	private:
+
+		std::string name;
 		
 		std::vector<int> layerSizes; 
 		std::vector<ActivationFunction> layerActivations;
@@ -59,7 +61,7 @@ class NeuralNetwork{
 		bool built = false;
 		
 		void initializeWeights(Neuron *n, int edges);
-		void parseData(std::string path, std::vector<std::vector<double>> &xDim, std::vector<std::vector<double>> &yDim);
+		void parseData(std::string path, std::vector<std::vector<double>> &xDim, std::vector<double> &yDim);
 		void backProp(std::vector<double> error);
 		void updateWeights();
 
@@ -69,14 +71,19 @@ class NeuralNetwork{
 	public:
 		
 		//contructor and destructor
-		NeuralNetwork(int layers[], int layersCount, ActivationFunction layerActivations[]);
+		NeuralNetwork(int layers[], int layersCount, ActivationFunction layerActivations[], std::string name="custom_model");
 		~NeuralNetwork();
 
 		//main functions for using model. 
 		void build(); //puts the network together
-		std::vector<double> evaluate(std::vector<double> input); //will activate each neuron in the network	
+		double evaluate(std::vector<double> input); //will activate each neuron in the network	
 		void train(std::string path, int iterations); //path to csv of training data. will be automagically split into xDim and yDim based on inp and out layer sizes.
 		void prune(double variance);
+
+		void saveModel();
+		void loadModel(std::string path);
+
+		static NeuralNetwork load(std::string path); //returns a class with parameters specified from the file.
 
 		//utility functions
 		void debug();
